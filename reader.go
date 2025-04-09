@@ -70,6 +70,9 @@ func NewReader(r io.Reader) *Reader {
 func NewStrictReader(r io.Reader) (*Reader, error) {
 	var b bytes.Buffer
 	if _, err := io.CopyN(&b, r, GLOBAL_HEADER_LENGTH); err != nil {
+		if errors.Is(err, io.EOF) {
+			return nil, ErrBadMagicHeader
+		}
 		return nil, err
 	}
 	if string(b.Bytes()) != GLOBAL_HEADER {
